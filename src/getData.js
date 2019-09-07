@@ -9,13 +9,25 @@ export default async function getData() {
   const [data, dataErr] = await handlePromise(fetch(`/api/data`));
 
   if (dataErr) {
-    throw new Error('Could not fetch data');
+    const [info, infoErr] = await handlePromise(fetch(`/api/info`));
+
+    if (infoErr) {
+      throw new Error('Could not fetch data nor info');
+    }
+
+    const [infoJson, infoJsonErr] = await handlePromise(info.json());
+
+    if (infoJsonErr) {
+      throw new Error('Could not parse info JSON');
+    }
+
+    return infoJson;
   }
 
   const [dataJson, dataJsonErr] = await handlePromise(data.json());
 
   if (dataJsonErr) {
-    throw new Error('Could not parse JSON');
+    throw new Error('Could not parse data JSON');
   }
 
   return dataJson;
